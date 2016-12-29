@@ -1,4 +1,4 @@
-name := "scalajs-hello-world"
+name := "task-airport"
 version in ThisBuild := "experimental-SNAPSHOT"
 
 scalaVersion in ThisBuild := "2.12.1"
@@ -7,48 +7,49 @@ scalacOptions in ThisBuild := Seq("-deprecation", "-feature", "-unchecked")
 lazy val root =
   (project in file("."))
     .aggregate(
-      scalajsHelloWorldJVM,
-      scalajsHelloWorldJS,
-      scalajsHelloWorldJSOutput
+      taskAirportJVM,
+      taskAirportJS,
+      taskAirportResources
     )
     .settings(
       libraryDependencies := Seq.empty,
       publishArtifact := false
     )
 
-lazy val scalajsHelloWorld =
+lazy val taskAirport =
   (crossProject in file("."))
     .settings(
-      name := "scalajs-hello-world",
+      name := "task-airport",
       libraryDependencies ++= Dependencies.shared.value
     )
     .jvmSettings(
-      mainClass in Compile := Some("hello.world.Server"),
+      mainClass in Compile := Some("task.airport.Server"),
       libraryDependencies ++= Dependencies.jvm.value
     )
     .jsSettings(
-      mainClass in Compile := Some("hello.world.Client"),
+      mainClass in Compile := Some("task.airport.Client"),
       persistLauncher in Compile := true,
       libraryDependencies ++= Dependencies.js.value,
       jsDependencies ++= Dependencies.jsDependencies.value
     )
 
-lazy val scalajsHelloWorldJVM =
-  scalajsHelloWorld.jvm
-    .dependsOn(scalajsHelloWorldJSOutput)
+lazy val taskAirportJVM =
+  taskAirport.jvm
+    .dependsOn(taskAirportResources)
 
-lazy val scalajsHelloWorldJS =
-  scalajsHelloWorld.js
+lazy val taskAirportJS =
+  taskAirport.js
 
-lazy val scalajsHelloWorldJSOutput =
+lazy val taskAirportResources =
   (project in file(s"js/target"))
     .settings(
-      name := s"${(name in scalajsHelloWorldJS).value}-js-output",
+      name := s"${(name in taskAirportJS).value}-resources",
       sourceDirectories := Seq.empty,
+      resourceDirectories := Seq.empty,
       managedResources in Compile := Seq(
-        (fastOptJS in(scalajsHelloWorldJS, Compile)).value.data,
-        (fastOptJS in(scalajsHelloWorldJS, Compile)).value.metadata(scalaJSSourceMap),
-        (packageScalaJSLauncher in(scalajsHelloWorldJS, Compile)).value.data
+        (fastOptJS in(taskAirportJS, Compile)).value.data,
+        (fastOptJS in(taskAirportJS, Compile)).value.metadata(scalaJSSourceMap),
+        (packageScalaJSLauncher in(taskAirportJS, Compile)).value.data
       ),
-      managedResourceDirectories in Compile += (classDirectory in(scalajsHelloWorldJS, Compile)).value.getParentFile
+      managedResourceDirectories in Compile += (classDirectory in(taskAirportJS, Compile)).value.getParentFile
     )
