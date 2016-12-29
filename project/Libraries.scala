@@ -80,6 +80,8 @@ object Libraries {
 
   object js {
 
+    val javaLogging = "org.scala-js" %%%! "scalajs-java-logging" % "0.1.0"
+
     val dom = "org.scala-js" %%%! "scalajs-dom" % "0.9.1"
     val jquery = "be.doeraene" %%%! "scalajs-jquery" % "0.9.1"
 

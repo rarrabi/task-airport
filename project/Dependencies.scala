@@ -58,6 +58,8 @@ object Dependencies {
   )
 
   val js = Def setting Seq(
+    Libraries.js.javaLogging,
+
     Libraries.js.dom,
     Libraries.js.jquery
   )
