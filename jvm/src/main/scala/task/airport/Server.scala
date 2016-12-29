@@ -5,6 +5,9 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.ExceptionHandler
 import akka.stream.ActorMaterializer
+import task.airport.util.ResourcesSupport._
+import task.airport.util.ScalaTagsSupport._
+import task.airport.util.WebJarsSupport._
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -37,15 +40,13 @@ object Server extends App {
     handleExceptions(exceptionHandler) {
       get {
         pathSingleSlash {
-          complete("index")
-        } ~ path("query") {
-          complete("query")
-        } ~ path("reports") {
-          complete("reports")
-        } ~ path("assets") {
-          complete("assets") // webjars
-        } ~ path("resources") {
-          complete("resources") // resources
+          complete {
+            pages.Index.render
+          }
+        } ~ pathPrefix(pages.paths.resources) {
+          resources
+        } ~ pathPrefix(pages.paths.assets) {
+          webJars
         }
       } ~ post {
         path("api") {
