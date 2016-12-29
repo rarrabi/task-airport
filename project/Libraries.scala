@@ -55,6 +55,8 @@ object Libraries {
 
     val upickleAkkaHttp = "de.heikoseeberger" %% "akka-http-upickle" % "1.11.0"
 
+    val scalaCsv = "com.github.tototoshi" % "scala-csv_2.12" % "1.3.4"
+
     object webjars {
 
       val jquery = "org.webjars" % "jquery" % "3.1.1-1"

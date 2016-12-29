@@ -47,6 +47,8 @@ object Dependencies {
 
     Libraries.jvm.upickleAkkaHttp,
 
+    Libraries.jvm.scalaCsv,
+
     Libraries.jvm.webjars.jquery,
 
     Libraries.jvm.provided.scalajsStubs,
