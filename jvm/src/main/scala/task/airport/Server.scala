@@ -5,9 +5,13 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.ExceptionHandler
 import akka.stream.ActorMaterializer
+import de.heikoseeberger.akkahttpupickle.UpickleSupport._
+import task.airport.api.{QueryImpl, ReportsImpl}
+import task.airport.model.{Airport, Country, Runway}
 import task.airport.util.ResourcesSupport._
 import task.airport.util.ScalaTagsSupport._
 import task.airport.util.WebJarsSupport._
+import upickle.default.macroRW
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -36,6 +40,10 @@ object Server extends App {
       }
   }
 
+  implicit val readwriter = macroRW[Country] merge macroRW[Airport] merge macroRW[Runway]
+  val query = QueryImpl(timeout = 5.seconds)
+  val reports = ReportsImpl(timeout = 5.seconds)
+
   val handler =
     handleExceptions(exceptionHandler) {
       get {
@@ -47,10 +55,28 @@ object Server extends App {
           resources
         } ~ pathPrefix(pages.paths.assets) {
           webJars
+        } ~ pathPrefix("api") {
+          pathPrefix("query") {
+            (path("searchCountry") & parameter('name.as[String])) { name =>
+              complete(s"searchCountry - $name")
+            }
+          } ~ pathPrefix("reports") {
+            path("airportCounts") {
+              onSuccess(reports.futures.airportCounts) tapply (complete(_))
+            } ~ path("runwaySurfaces") {
+              onSuccess(reports.futures.runwaySurfaces)(complete(_))
+            } ~ path("runwayIdentifications") {
+              onSuccess(reports.futures.runwayIdentifications)(complete(_))
+            }
+          }
         }
       } ~ post {
-        path("api") {
-          complete("api") // query, reports
+        pathPrefix("api") {
+          pathPrefix("reports") {
+            path("airportCounts") {
+              onSuccess(reports.futures.airportCounts) tapply (complete(_))
+            }
+          }
         }
       }
     }
