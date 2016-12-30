@@ -23,7 +23,7 @@ case class QueryImpl(timeout: Duration)(implicit materializer: Materializer) ext
         .concat {
           Data.countries
             .mapConcat { country =>
-              prefixes(country.name) map (_ -> country)
+              prefixes(country.name) map (normalize(_) -> country)
             }
         }
         .foldMap
@@ -33,7 +33,7 @@ case class QueryImpl(timeout: Duration)(implicit materializer: Materializer) ext
         .flatMapConcat { textToCountry =>
           Flows.airportsAndRunwaysByCountry
             .map { countryToAirportAndRunways =>
-              textToCountry get text flatMap { country =>
+              textToCountry get normalize(text) flatMap { country =>
                 countryToAirportAndRunways get country map (country -> _.toSeq)
               }
             }
@@ -54,10 +54,13 @@ case class QueryImpl(timeout: Duration)(implicit materializer: Materializer) ext
     Await.result(futures.searchCountry(text), timeout)
 
   private def prefixes(name: String): List[String] = {
-    val prefix = name take 3
-    val suffix = name drop 3
+    val prefix = name take 2
+    val suffix = name drop 2
     val result = suffix.scanLeft(prefix)(_ + _)
     result.toList
   }
+
+  private def normalize(text: String) =
+    text.toLowerCase
 
 }

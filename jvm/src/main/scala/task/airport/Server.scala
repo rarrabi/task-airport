@@ -40,7 +40,7 @@ object Server extends App {
       }
   }
 
-  implicit val readwriter = macroRW[Country] merge macroRW[Airport] merge macroRW[Runway]
+  implicit val rw = macroRW[Country] merge macroRW[Airport] merge macroRW[Runway]
   val query = QueryImpl(timeout = 5.seconds)
   val reports = ReportsImpl(timeout = 5.seconds)
 
@@ -58,7 +58,7 @@ object Server extends App {
         } ~ pathPrefix("api") {
           pathPrefix("query") {
             (path("searchCountry") & parameter('name.as[String])) { name =>
-              complete(s"searchCountry - $name")
+              onSuccess(query.futures searchCountry name)(complete(_))
             }
           } ~ pathPrefix("reports") {
             path("airportCounts") {
